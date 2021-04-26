@@ -1,0 +1,24 @@
+.qm-w400 {
+    width: 400px;
+}
+
+.qm-w100 {
+    width: 100%;
+}
+
+.qm-dblock {
+    display: block;
+}
+
+.qm-qstyle {
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 4%);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+@media screen and (max-width: 768px) {
+    .qm-w400 {
+        width: auto;
+    }
+}

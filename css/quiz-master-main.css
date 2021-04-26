@@ -1,0 +1,52 @@
+.qm-square {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 10px !important;
+    width: 40px;
+}
+
+.qm-qlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.qm-bactive {
+    background-color: rgb(59, 59, 59) !important;
+}
+
+.qm-qactive {
+    display: list-item;
+}
+
+.qm-collapsed {
+    display: none;
+}
+
+.qm-mb-1 {
+    margin-bottom: 1rem;
+}
+
+.qm-fw-b {
+    font-weight: bold;
+}
+
+.qm-d-inline {
+    display: inline;
+}
+
+.qm-right {
+    float: right;
+}
+
+.qm-fs-smaller {
+    font-size: smaller;
+}
+
+#qm-bnext {
+    float: right;
+}
+
+#qm-bprev, #qm-bnext {
+    margin-bottom: 10px;
+}
