@@ -280,7 +280,7 @@ function add_tests_settings() {
 			<p>
 				<input id="schemes_t_add_id" name="schemes_t_add_id" type="text" placeholder="ID теста" class="qm-w400">
 				<input id="schemes_t_add_name" name="schemes_t_add_name" type="text" placeholder="Имя теста" class="qm-w400">
-				<input type="number" name="schemes_t_add_duration" id="schemes_t_add_duration" placeholder="Длительность (с)">
+				<input type="number" name="schemes_t_add_duration" id="schemes_t_add_duration" placeholder="Длительность (мин)">
 				<input id="schemes_t_add_button" name="schemes_t_add_button" class="button" type="submit" value="Добавить тест">
 			</p>
 		</form>
@@ -290,7 +290,7 @@ function add_tests_settings() {
         <tr>
         <th style="width: 30%;">ID теста</th>
 		<th style="width: 40%;">Имя теста</th>
-		<th style="width: 30%;">Длительность (с)</th>
+		<th style="width: 30%;">Длительность (мин)</th>
         </tr>
 		</thead>
 		<tbody>
@@ -333,7 +333,7 @@ function add_tests_settings() {
 		</thead>
 		<tbody>
         <?php 
-            $schemes_q = $wpdb->get_results( "SELECT test_id, ifnull((select name from " . $wpdb->prefix . "qm_categories where id = category_list), category_list) category_list, question_count FROM " . $wpdb->prefix . "qm_schemes_q" );
+            $schemes_q = $wpdb->get_results( "SELECT test_id, if(length(category_list) > 3, category_list,(select name from " . $wpdb->prefix . "qm_categories where id = category_list)) category_list, question_count FROM " . $wpdb->prefix . "qm_schemes_q" );
             foreach ($schemes_q as $scheme_q) {
                 echo '<tr><td>' . $scheme_q->test_id . '</td><td>' . $scheme_q->category_list . '</td><td>' . $scheme_q->question_count . '</td></tr>';
             }

@@ -10,6 +10,17 @@ function quiz_main_func() {
         elseif (!empty($_POST['end-button'])) {
             $out = quiz_end_func();
         }
+        elseif (!empty($_POST['mytests-button'])) {
+            $out = quiz_mytests_func();
+        }
+        else {
+            foreach ($_POST as $param_name => $param_val) {
+                if (str_contains($param_name, 'save_test_')) {
+                    $test_id = str_replace('save_test_', '', $param_name);
+                    save_test_func($test_id);
+                }
+            }
+        }
     }
     else {
         $out = quiz_select_func();
@@ -23,7 +34,6 @@ function quiz_end_func() {
     $dtest = array (
         'user_id' => get_current_user_id(),
         'test_name' => $_POST['testname'],
-        //'test_date' => date('Y-m-d H:i:s'),
     );
     $wpdb->insert($wpdb->prefix . "qm_tests", $dtest);
     
@@ -96,13 +106,35 @@ function quiz_get_questions($test_type) {
 function quiz_select_func() {
     global $wpdb;
     $test_list = $wpdb->get_results( "select test_id, test_name, duration from " . $wpdb->prefix . "qm_schemes_t" );
-    $out = '<div><form id="select-form" method="post">';
-    
+    $out = '<div><form id="select-form" method="post"><input class="qm-mytests" name="mytests-button" type="submit" value="Мои тесты">';    
     foreach ($test_list as $test_item) {
         $out = $out . '<p><input type="radio" name="selected-test" id="' . $test_item->test_id . '" value="' . $test_item->test_id . '"><label style="margin-left: .5rem;" for="' . $test_item->test_id . '">' . $test_item->test_name . '</label></p>';
+    }    
+    $out = $out . '<input name="begin-button" type="submit" value="Начать тест"></form></div>';
+    return $out;
+}
+
+function quiz_mytests_func() {
+    global $wpdb;
+    
+    $out = '<form id="save_test" method="POST">
+    <table class="widefat fixed striped">
+    <thead>
+    <tr>
+    <th>№</th>
+    <th>Имя теста</th>
+    <th>Дата</th>
+    <th>#</th>
+    </tr>
+    </thead>
+    <tbody>';
+    
+    $tests = $wpdb->get_results( "SELECT id, test_name, test_date from " . $wpdb->prefix . "qm_tests wt where wt.user_id = " . get_current_user_id() . " order by test_date desc" );
+    foreach ($tests as $test) {
+        $out = $out . '<tr><td>' . $test->id . '</td><td>' . $test->test_name . '</td><td>' . $test->test_date . '</td><td><input id="save_test_' . $test->id . '" name="save_test_' . $test->id . '" class="button" type="submit" value="Сохранить"></td></tr>';
     }
     
-    $out = $out . '<input name="begin-button" type="submit" value="Начать тест"></form></div>';
+    $out = $out . '</tbody></table></form>';
     return $out;
 }
 
