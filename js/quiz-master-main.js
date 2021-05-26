@@ -106,3 +106,12 @@ if (testTimer) {
         }        
     }, 60000);
 }
+
+let testForm = document.getElementById('qm-qlist');
+if (testForm) {
+    let areas = testForm.getElementsByTagName('textarea');
+    for (let i = 0; i < areas.length; i++) {
+        const area = areas[i];
+        area.addEventListener('paste', e => e.preventDefault());
+    }
+}
