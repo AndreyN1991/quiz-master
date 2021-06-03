@@ -130,7 +130,7 @@ function add_main_settings() {
 		</thead>
 		<tbody>		
 		<?php
-			$tests = $wpdb->get_results( "SELECT id, user_id, test_name, test_date, (select meta_value from " . $wpdb->prefix . "usermeta wm where wm.user_id = wt.user_id and meta_key = 'shop') shop, (select display_name from " . $wpdb->prefix . "users where " . $wpdb->prefix . "users.ID = wt.user_id) display_name from " . $wpdb->prefix . "qm_tests wt order by test_date desc" );
+			$tests = $wpdb->get_results( "SELECT id, user_id, test_name, test_date, (select meta_value from " . $wpdb->prefix . "usermeta wm where wm.user_id = wt.user_id and meta_key = 'shop') shop, (select display_name from " . $wpdb->prefix . "users where " . $wpdb->prefix . "users.ID = wt.user_id) display_name from " . $wpdb->prefix . "qm_tests wt where wt.test_end is not null and (select count(*) from wp_qm_results r where wt.id = r.test_id and length(answer) > 0) > 0 order by test_date desc" );
 			foreach ($tests as $test) {
 				echo '<tr><td>' . $test->id . '</td><td>' . $test->display_name . '</td><td>' . $test->shop . '</td><td>' . $test->test_name . '</td><td>' . $test->test_date . '</td><td><input id="save_test_' . $test->id . '" name="save_test_' . $test->id . '" class="button" type="submit" value="Сохранить"></td></tr>';
 			}

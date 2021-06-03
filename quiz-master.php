@@ -2,7 +2,7 @@
 /*
 Plugin Name: Quiz Master
 Description: Модуль онлайн тестирования персонала
-Version: 1.1.1
+Version: 1.2.1
 Author: Андрей Намашко
 */
 
@@ -43,6 +43,7 @@ function jal_install () {
             user_id mediumint(9) DEFAULT '0' NOT NULL,
             test_name text NOT NULL,
             test_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            test_end TIMESTAMP,
             UNIQUE KEY id (id)
         );";
 
@@ -93,7 +94,7 @@ add_action( 'admin_enqueue_scripts', function() {
 
 add_action( 'wp_enqueue_scripts', function() {
 	wp_enqueue_style( 'quiz-master-main', plugin_dir_url( __FILE__ ) . 'css/quiz-master-main.css' );
-    wp_enqueue_script( 'quiz-master-main', plugin_dir_url( __FILE__ ) . 'js/quiz-master-main.js', '', '', true );
+    wp_enqueue_script( 'quiz-master-main', plugin_dir_url( __FILE__ ) . 'js/quiz-master-main_kALpAFg1Kc.js', '', '', true );
 });
 
 include('quiz-master-admin.php');

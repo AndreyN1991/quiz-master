@@ -31,13 +31,13 @@ function quiz_main_func() {
 function quiz_end_func() {
     global $wpdb;
 
-    $dtest = array (
-        'user_id' => get_current_user_id(),
-        'test_name' => $_POST['testname'],
+    $test_id = $wpdb->get_results( "select max(id) id from " . $wpdb->prefix . "qm_tests where user_id = " . get_current_user_id() )[0]->id;
+    $ct = $wpdb->get_results( "select current_timestamp ct" )[0]->ct;
+
+    $wpdb->update( $wpdb->prefix . 'qm_tests',
+	    [ 'test_end' => $ct ],
+	    [ 'id' => $test_id ]
     );
-    $wpdb->insert($wpdb->prefix . "qm_tests", $dtest);
-    
-    $test_id = $wpdb->insert_id;
     
     foreach ($_POST as $param_name => $param_val) {
         if ($param_name != 'end-button' && $param_name != 'testname') {
@@ -61,7 +61,14 @@ function quiz_test_func() {
     global $wpdb;
     $questions = quiz_get_questions($_POST['selected-test']);
     $test_name = $wpdb->get_results( "select test_id, test_name, duration from " . $wpdb->prefix . "qm_schemes_t where test_id = '" . $_POST['selected-test'] . "'" );
-        
+    
+    //Добавляю начатый тест в базу
+    $dtest = array (
+        'user_id' => get_current_user_id(),
+        'test_name' => $test_name[0]->test_name,
+    );
+    $wpdb->insert($wpdb->prefix . "qm_tests", $dtest);
+
     $out = '<section><div class="qm-mb-1 qm-fw-b"><div class="qm-d-inline">' . $test_name[0]->test_name . '</div><div class="qm-d-inline qm-right qm-fs-smaller">Осталось времени: <span id="test-timer">' . $test_name[0]->duration . '</span> мин.</div></div><div>';
     for($i = 0; $i < count($questions); ++$i) {
         $out = $out . '<input id="qm-b' . $questions[$i]->id . '" type="button" value="' . ($i + 1) . '" class="qm-square">';
@@ -74,7 +81,6 @@ function quiz_test_func() {
     }
 
     $out = $out . '</ul>
-        <input style="display: none;" type="text" id="testname" name="testname" value="' . $test_name[0]->test_name . '">
         <div>
             <input id="qm-bprev" type="button" value="Назад">
             <input id="qm-bnext" type="button" value="Вперед">
@@ -83,7 +89,7 @@ function quiz_test_func() {
             <input type="submit" id="end-button" name="end-button" value="Завершить тест">
         </div>
         </form></div></section>';
-    
+
     return $out;
 }
 
@@ -129,7 +135,7 @@ function quiz_mytests_func() {
     </thead>
     <tbody>';
     
-    $tests = $wpdb->get_results( "SELECT id, test_name, test_date from " . $wpdb->prefix . "qm_tests wt where wt.user_id = " . get_current_user_id() . " order by test_date desc" );
+    $tests = $wpdb->get_results( "SELECT id, test_name, test_date from " . $wpdb->prefix . "qm_tests wt where wt.user_id = " . get_current_user_id() . " and wt.test_end is not null and (select count(*) from wp_qm_results r where wt.id = r.test_id and length(answer) > 0) > 0 order by test_date desc" );
     foreach ($tests as $test) {
         $out = $out . '<tr><td>' . $test->id . '</td><td>' . $test->test_name . '</td><td>' . $test->test_date . '</td><td><input id="save_test_' . $test->id . '" name="save_test_' . $test->id . '" class="button" type="submit" value="Сохранить"></td></tr>';
     }
