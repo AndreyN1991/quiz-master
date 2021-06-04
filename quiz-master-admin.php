@@ -48,6 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	elseif (!empty($_POST['category_del_button'])) {
 		$wpdb->query( "delete from " . $wpdb->prefix . "qm_categories where id = " . $_POST['category_del_id'] );
 	}
+	elseif (!empty($_POST['filter_tests_button'])) {
+	}
 	else {
 		foreach ($_POST as $param_name => $param_val) {
 			if (str_contains($param_name, 'save_test_')) {
@@ -107,14 +109,70 @@ function add_main_settings() {
 
 		<div>
 
-		<form style="display: none;" id="save_tests" method="POST">
-			<fieldset class="qm-qstyle">
-				<legend>Выгрузка тестов</legend>					
+		
+		<fieldset class="qm-qstyle">
+			<legend>Фильтровать тесты</legend>
+			<form id="filter_tests" method="POST">					
 				<p>
-				<input id="save_tests_button" name="save_tests_button" class="button" type="submit" value="Выгрузить тесты">
+				<label for="filter_tests_byshop">Магазин</label>
+				<select name="filter_tests_byshop" id="filter_tests_byshop">
+					<option value="none">Не выбрано</option>
+ 					<option value="hyper">Гипермаркет</option>
+ 					<option value="sherif1">Шериф-1</option>
+ 					<option value="sherif2">Шериф-2</option>
+ 					<option value="sherif3">Шериф-3</option>
+ 					<option value="sherif4">Шериф-4</option>
+ 					<option value="sherif5">Шериф-5</option>
+ 					<option value="sherif6">Шериф-6</option>
+ 					<option value="sherif7">Шериф-7</option>
+ 					<option value="sherif8">Шериф-8</option>
+ 					<option value="sherif9">Шериф-9</option>
+ 					<option value="sherif10">Шериф-10</option>
+ 					<option value="sherif11">Шериф-11</option>
+ 					<option value="sherif12">Шериф-12</option>
+ 					<option value="sherif13">Шериф-13</option>
+ 					<option value="sherif14">Шериф-14</option>
+ 					<option value="sherif15">Шериф-15</option>
+ 					<option value="sherif16">Шериф-16</option>
+ 					<option value="sherif17">Шериф-17</option>
+ 					<option value="sherif18">Шериф-18</option>
+ 					<option value="sherif19">Шериф-19</option>
+ 					<option value="sherif20">Шериф-20</option>
+ 					<option value="sherif21">Шериф-21</option>
+ 					<option value="sherif22">Шериф-22</option>
+ 					<option value="sherif23">Шериф-23</option>
+ 					<option value="market24">Маркет-24</option>
+ 					<option value="market25">Маркет-25</option>
+ 					<option value="market26">Маркет-26</option>
+ 					<option value="sherif27">Шериф-27</option>
+ 					<option value="nika">Магазин Ника</option>
+ 					<option value="opt3">ОПТ-3</option>
+				</select>
 				</p>
-			</fieldset>			
-		</form>
+				<p>
+				<label for="filter_tests_bytest">Тест</label>
+				<select name="filter_tests_bytest" id="filter_tests_bytest">
+				<?
+					$test_types = $wpdb->get_results( "select test_id, test_name, duration from wp_qm_schemes_t" );
+					echo '<option value="none">Не выбрано</option>';
+					foreach ($test_types as $test_type) {
+						echo '<option value="' . $test_type->test_id . '">' . $test_type->test_name . '</option>';
+					}
+				?>
+				</select>
+				</p>
+				<p>
+				<label for="filter_bydate_bgn">Начало</label>
+				<input type="date" name="filter_bydate_bgn" id="filter_bydate_bgn">
+				<label for="filter_bydate_end">Конец</label>
+				<input type="date" name="filter_bydate_end" id="filter_bydate_end">
+				</p>
+				<p>
+				<input id="filter_tests_button" name="filter_tests_button" class="button" type="submit" value="Фильтровать">
+				</p>
+			</form>
+		</fieldset>			
+		
 
 		<form id="save_test" method="POST">
 		<table class="widefat fixed striped">
@@ -125,14 +183,39 @@ function add_main_settings() {
 		<th>Магазин</th>
 		<th>Имя теста</th>
 		<th>Дата</th>
+		<th>Время (мин)</th>
 		<th>#</th>
 		</tr>
 		</thead>
 		<tbody>		
 		<?php
-			$tests = $wpdb->get_results( "SELECT id, user_id, test_name, test_date, (select meta_value from " . $wpdb->prefix . "usermeta wm where wm.user_id = wt.user_id and meta_key = 'shop') shop, (select display_name from " . $wpdb->prefix . "users where " . $wpdb->prefix . "users.ID = wt.user_id) display_name from " . $wpdb->prefix . "qm_tests wt where wt.test_end is not null and (select count(*) from wp_qm_results r where wt.id = r.test_id and length(answer) > 0) > 0 order by test_date desc" );
+			$tests = $wpdb->get_results( "SELECT id, user_id, test_name, test_date, timestampdiff(minute, test_date, test_end) duration, (select meta_value from " . $wpdb->prefix . "usermeta wm where wm.user_id = wt.user_id and meta_key = 'shop') shop, (select test_id from " . $wpdb->prefix . "qm_schemes_t st where st.test_name = wt.test_name) test_id, (select display_name from " . $wpdb->prefix . "users where " . $wpdb->prefix . "users.ID = wt.user_id) display_name from " . $wpdb->prefix . "qm_tests wt where wt.test_end is not null and (select count(*) from " . $wpdb->prefix . "qm_results r where wt.id = r.test_id and length(answer) > 0) > 0 order by test_date desc" );
+			if (!empty($_POST['filter_tests_byshop'])) {
+				if ($_POST['filter_tests_byshop'] != 'none') {
+					$tests = array_filter($tests, function($k) {
+						return $k->shop == $_POST['filter_tests_byshop'];
+					});
+				}
+			}
+			if (!empty($_POST['filter_tests_bytest'])) {
+				if ($_POST['filter_tests_bytest'] != 'none') {
+					$tests = array_filter($tests, function($k) {
+						return $k->test_id == $_POST['filter_tests_bytest'];
+					});
+				}
+			}
+			if (!empty($_POST['filter_bydate_bgn']) && !empty($_POST['filter_bydate_end'])) {
+				$tests = array_filter($tests, function($k) {
+					if ($k->test_date >= $_POST['filter_bydate_bgn'] && $k->test_date <= $_POST['filter_bydate_end']) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				});
+			}
 			foreach ($tests as $test) {
-				echo '<tr><td>' . $test->id . '</td><td>' . $test->display_name . '</td><td>' . $test->shop . '</td><td>' . $test->test_name . '</td><td>' . $test->test_date . '</td><td><input id="save_test_' . $test->id . '" name="save_test_' . $test->id . '" class="button" type="submit" value="Сохранить"></td></tr>';
+				echo '<tr><td>' . $test->id . '</td><td>' . $test->display_name . '</td><td>' . $test->shop . '</td><td>' . $test->test_name . '</td><td>' . $test->test_date . '</td><td>' . $test->duration . '</td><td><input id="save_test_' . $test->id . '" name="save_test_' . $test->id . '" class="button" type="submit" value="Сохранить"></td></tr>';
 			}
 		?>
 		</tbody>
