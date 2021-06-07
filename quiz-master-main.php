@@ -31,7 +31,14 @@ function quiz_main_func() {
 function quiz_end_func() {
     global $wpdb;
 
-    $test_id = $wpdb->get_results( "select max(id) id from " . $wpdb->prefix . "qm_tests where user_id = " . get_current_user_id() )[0]->id;
+    $test_id = $_POST['test'];
+
+    //Проверяю если тест уже не закончен
+    $test_end = $wpdb->get_results( "select test_end, user_id from " . $wpdb->prefix . "qm_tests where id = " . $test_id );
+    if (count($test_end) == 0 || !is_null($test_end[0]->test_end) || $test_end[0]->user_id != get_current_user_id()) {
+        return '<div>Результаты теста не сохранены!</div>';
+    }
+
     $ct = $wpdb->get_results( "select current_timestamp ct" )[0]->ct;
 
     $wpdb->update( $wpdb->prefix . 'qm_tests',
@@ -40,7 +47,7 @@ function quiz_end_func() {
     );
     
     foreach ($_POST as $param_name => $param_val) {
-        if ($param_name != 'end-button' && $param_name != 'testname') {
+        if ($param_name != 'end-button' && $param_name != 'test') {
             $qid = str_replace('q', '', $param_name);
 
             $dresult = array (
@@ -68,6 +75,8 @@ function quiz_test_func() {
         'test_name' => $test_name[0]->test_name,
     );
     $wpdb->insert($wpdb->prefix . "qm_tests", $dtest);
+    
+    $test_id = $wpdb->insert_id;
 
     $out = '<section><div class="qm-mb-1 qm-fw-b"><div class="qm-d-inline">' . $test_name[0]->test_name . '</div><div class="qm-d-inline qm-right qm-fs-smaller">Осталось времени: <span id="test-timer">' . $test_name[0]->duration . '</span> мин.</div></div><div>';
     for($i = 0; $i < count($questions); ++$i) {
@@ -86,6 +95,7 @@ function quiz_test_func() {
             <input id="qm-bnext" type="button" value="Вперед">
         </div>
         <div>
+            <input style="display: none;" type="text" id="test" name="test" value="' . $test_id . '">
             <input type="submit" id="end-button" name="end-button" value="Завершить тест">
         </div>
         </form></div></section>';
