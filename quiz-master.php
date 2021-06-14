@@ -2,7 +2,7 @@
 /*
 Plugin Name: Quiz Master
 Description: Модуль онлайн тестирования персонала
-Version: 1.2.3
+Version: 1.2.4
 Author: Андрей Намашко
 */
 
@@ -99,5 +99,6 @@ add_action( 'wp_enqueue_scripts', function() {
 
 include('quiz-master-admin.php');
 include('quiz-master-main.php');
+include('quiz-master-check.php');
 
 ?>
