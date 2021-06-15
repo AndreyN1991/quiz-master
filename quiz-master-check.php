@@ -3,14 +3,18 @@
 add_action( 'init', 'check_test_begin' );
 
 function check_test_begin() {
-    global $wpdb;
-    $current_url = home_url($_SERVER['REQUEST_URI']);
+    if (is_user_logged_in()) {
 
-    $last_test = $wpdb->get_results( "select * from " . $wpdb->prefix . "qm_tests where user_id = " . get_current_user_id() . " and test_end is null order by test_date desc limit 1" )[0];
+        global $wpdb;
+        $last_test = $wpdb->get_results( "select * from " . $wpdb->prefix . "qm_tests where user_id = " . get_current_user_id() . " and test_end is null order by test_date desc limit 1" )[0];
 
-    if ($last_test) {
-        if (strcmp($current_url, "http://ed.sheriff.md/check/") !== 0 && strcmp($current_url, "http://ed.sheriff.md/testy/") !== 0) {
-            wp_redirect( "http://ed.sheriff.md/check/" );
+        if ($last_test) {
+            
+            $current_url = home_url($_SERVER['REQUEST_URI']);
+
+            if (strcmp($current_url, "http://ed.sheriff.md/check/") !== 0 && strcmp($current_url, "http://ed.sheriff.md/testy/") !== 0) {
+                wp_redirect( "http://ed.sheriff.md/check/" );
+            }
         }
     }
 }
