@@ -39,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		$wpdb->insert($wpdb->prefix . "qm_categories", $data);
 	}
 	elseif (!empty($_POST['schemes_t_del_button'])) {
-		$wpdb->query( "delete from " . $wpdb->prefix . "qm_schemes_t where id = " . $_POST['schemes_t_del_id'] );
-		$wpdb->query( "delete from " . $wpdb->prefix . "qm_schemes_q where id = " . $_POST['schemes_t_del_id'] );
+		$wpdb->query( "delete from " . $wpdb->prefix . "qm_schemes_t where test_id = '" . $_POST['schemes_t_del_id'] . "'" );
+		$wpdb->query( "delete from " . $wpdb->prefix . "qm_schemes_q where test_id = '" . $_POST['schemes_t_del_id'] . "'" );
 	}
 	elseif (!empty($_POST['question_del_button'])) {
 		$wpdb->query( "delete from " . $wpdb->prefix . "qm_questions where id = " . $_POST['question_del_id'] );
