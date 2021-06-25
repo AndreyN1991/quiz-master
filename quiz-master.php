@@ -2,7 +2,7 @@
 /*
 Plugin Name: Quiz Master
 Description: Модуль онлайн тестирования персонала
-Version: 1.2.5
+Version: 1.3.0
 Author: Андрей Намашко
 */
 

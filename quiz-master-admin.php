@@ -66,7 +66,7 @@ function quiz_master_menu() {
     add_menu_page(
 		'Результаты тестирования персонала',
 		'Тестирование',
-		'publish_pages',
+		'list_users',
 		'site-options',
 		'add_main_settings',
 		plugins_url( 'quiz-master/images/icon.png' )
@@ -106,14 +106,18 @@ function add_main_settings() {
 	?>
 	<div class="wrap">
 		<h2><?php echo get_admin_page_title() ?></h2>
-
 		<div>
-
-		
 		<fieldset class="qm-qstyle">
 			<legend>Фильтровать тесты</legend>
 			<form id="filter_tests" method="POST">					
-				<p>
+				<p				
+				<?php
+					$user = wp_get_current_user();
+					if ( in_array( 'author', (array) $user->roles ) ) {
+						echo ' hidden';
+					}
+				?>
+				>
 				<label for="filter_tests_byshop">Магазин</label>
 				<select name="filter_tests_byshop" id="filter_tests_byshop">
 					<option value="none">Не выбрано</option>
@@ -171,9 +175,7 @@ function add_main_settings() {
 				<input id="filter_tests_button" name="filter_tests_button" class="button" type="submit" value="Фильтровать">
 				</p>
 			</form>
-		</fieldset>			
-		
-
+		</fieldset>
 		<form id="save_test" method="POST">
 		<table class="widefat fixed striped">
 		<thead>
@@ -212,6 +214,13 @@ function add_main_settings() {
 					else {
 						return false;
 					}
+				});
+			}
+			$user = wp_get_current_user();
+			if ( in_array( 'author', (array) $user->roles ) ) {
+				$tests = array_filter($tests, function($k) {
+					$user = wp_get_current_user();
+					return $k->shop === get_user_meta( $user->ID, "shop", 1 );
 				});
 			}
 			foreach ($tests as $test) {
