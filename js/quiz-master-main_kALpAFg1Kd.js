@@ -22,16 +22,20 @@ function showQuestion(target) {
     let questions = document.getElementsByClassName('qm-qactive');
     for (let z = 0; z < questions.length; z++) {
         let q = questions.item(z);
-        q.classList.replace('qm-qactive', 'qm-collapsed');
+        q.classList.remove('qm-qactive');
+        q.classList.add('qm-collapsed');
     }
 
     let question = document.getElementById(qId);
-    question.classList.replace('qm-collapsed', 'qm-qactive');
+    question.classList.remove('qm-collapsed');
+    question.classList.add('qm-qactive');
 }
 
 if (qmbuttons.item(0)) {
     qmbuttons.item(0).classList.add('qm-bactive');
-    document.getElementsByClassName('qm-collapsed').item(0).classList.replace('qm-collapsed', 'qm-qactive');
+    let b = document.getElementsByClassName('qm-collapsed').item(0);
+    b.classList.remove('qm-collapsed');
+    b.classList.add('qm-qactive');
 }
 
 let bprev = document.getElementById('qm-bprev');
